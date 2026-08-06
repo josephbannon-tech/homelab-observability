@@ -1,0 +1,1361 @@
+{
+  "title": "Capacity, Growth & Backup/DR",
+  "uid": "capacity-backup-dr",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timezone": "Europe/London",
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "refresh": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 900,
+      "title": "Active alerts \u2014 this dashboard's scope",
+      "type": "row",
+      "collapsed": false,
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 901,
+      "title": "Firing now",
+      "type": "table",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Alerts firing right now that fall within this dashboard's scope. Empty is good \u2014 any row is a live incident for these services.",
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "Severity",
+            "desc": false
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "ALERTS{alertstate=\"firing\", service=~\"storage|platform\"}",
+          "instant": true,
+          "format": "table",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "Value": true,
+              "alertstate": true,
+              "namespace": true,
+              "prometheus": true,
+              "job": true,
+              "endpoint": true,
+              "container": true,
+              "pod": true,
+              "hostname": true,
+              "device": true,
+              "mountpoint": true,
+              "attribute_name": true,
+              "attribute_value_type": true,
+              "fstype": true,
+              "zpool": true,
+              "model_name": true,
+              "state": true,
+              "name": true
+            },
+            "renameByName": {
+              "alertname": "Alert",
+              "severity": "Severity",
+              "service": "Service",
+              "instance": "Host"
+            },
+            "indexByName": {
+              "alertname": 0,
+              "severity": 1,
+              "service": 2,
+              "instance": 3
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Severity"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "critical": {
+                        "color": "red",
+                        "text": "CRITICAL",
+                        "index": 0
+                      },
+                      "warning": {
+                        "color": "orange",
+                        "text": "WARNING",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "title": "Filesystem Free Space (%) \u2014 across all hosts",
+      "type": "row",
+      "collapsed": false,
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "title": "Free %",
+      "type": "bargauge",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Free space remaining as a percentage of each filesystem, all hosts. Thresholds are inverted from fill: red below 15% free, green above 30%.",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 10
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "valueMode": "color"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 15
+              },
+              {
+                "color": "green",
+                "value": 30
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay|squashfs|devtmpfs|fuse.*|ramfs|autofs|nsfs|tracefs|securityfs|cgroup.*|bpf|debugfs|configfs|hugetlbfs|mqueue|pstore|sysfs|proc|none\",mountpoint!~\"/var/lib/kubelet.*|/var/lib/docker.*|/run.*|/snap.*|/boot/efi\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|overlay|squashfs|devtmpfs|fuse.*|ramfs|autofs|nsfs|tracefs|securityfs|cgroup.*|bpf|debugfs|configfs|hugetlbfs|mqueue|pstore|sysfs|proc|none\",mountpoint!~\"/var/lib/kubelet.*|/var/lib/docker.*|/run.*|/snap.*|/boot/efi\"}",
+          "legendFormat": "{{hostname}}: {{mountpoint}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Filesystem Days-to-Full (linear projection from last 7d)",
+      "type": "row",
+      "collapsed": false,
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 4,
+      "title": "Days remaining (positive = filling; absent = stable/growing slowly)",
+      "type": "bargauge",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Linear projection of days until each filesystem fills, from the last 7d trend. A filesystem that is stable or shrinking has no series here \u2014 an absent bar is good, not an error. Red below 7 days.",
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 8
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "valueMode": "color"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "d",
+          "min": 0,
+          "max": 180,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 7
+              },
+              {
+                "color": "green",
+                "value": 30
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "(node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay|squashfs|devtmpfs|fuse.*|ramfs|autofs|nsfs|tracefs|securityfs|cgroup.*|bpf|debugfs|configfs|hugetlbfs|mqueue|pstore|sysfs|proc|none\",mountpoint!~\"/var/lib/kubelet.*|/var/lib/docker.*|/run.*|/snap.*|/boot/efi\"} /  (-deriv(node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay|squashfs|devtmpfs|fuse.*|ramfs|autofs|nsfs|tracefs|securityfs|cgroup.*|bpf|debugfs|configfs|hugetlbfs|mqueue|pstore|sysfs|proc|none\",mountpoint!~\"/var/lib/kubelet.*|/var/lib/docker.*|/run.*|/snap.*|/boot/efi\"}[7d]) > 0) ) / 86400",
+          "legendFormat": "{{hostname}}: {{mountpoint}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "ZFS Pools (NAS)",
+      "type": "row",
+      "collapsed": false,
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 6,
+      "title": "JBNAS_SSD pool state",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "zpool health of JBNAS_SSD. ONLINE = healthy; DEGRADED is a DR concern \u2014 a degraded pool may lose redundancy or capacity.",
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 6,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DEGRADED",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "ONLINE",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_zfs_zpool_state{hostname=\"JBNAS01\", zpool=\"JBNAS_SSD\", state=\"online\"}",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "JBNAS_MEDIA pool state",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "zpool health of JBNAS_MEDIA \u2014 a stripe pool with no parity. DEGRADED means imminent data loss; treat as a critical DR incident.",
+      "gridPos": {
+        "x": 6,
+        "y": 28,
+        "w": 6,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DEGRADED",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "ONLINE",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_zfs_zpool_state{hostname=\"JBNAS01\", zpool=\"JBNAS_MEDIA\", state=\"online\"}",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Data dataset usage %",
+      "type": "bargauge",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Space used by the data-holding ZFS datasets (JBNAS_SSD/data, JBNAS_MEDIA/plex) as a percentage of used + pool-free. Yellow 70%, red 90% \u2014 a near-full pool is a capacity incident.",
+      "gridPos": {
+        "x": 12,
+        "y": 28,
+        "w": 12,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "valueMode": "color"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * (1 - node_filesystem_avail_bytes{fstype=\"zfs\",mountpoint=~\"/mnt/JBNAS_SSD/data|/mnt/JBNAS_MEDIA/plex\"} / node_filesystem_size_bytes{fstype=\"zfs\",mountpoint=~\"/mnt/JBNAS_SSD/data|/mnt/JBNAS_MEDIA/plex\"})",
+          "legendFormat": "{{mountpoint}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Estate Headroom \u2014 RAM & CPU per Host",
+      "type": "row",
+      "collapsed": false,
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 10,
+      "title": "Free memory (%)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Free memory as a percentage of total, per host. Sustained low free memory on any host risks the OOM killer.",
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 12,
+        "h": 8
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max",
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "stacking": {
+          "mode": "none"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "opacity"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * avg by (hostname) (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)",
+          "legendFormat": "{{hostname}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "CPU idle (%)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "CPU idle percentage per host. Low idle = the host is CPU-bound; this is the spare-capacity view for the estate.",
+      "gridPos": {
+        "x": 12,
+        "y": 33,
+        "w": 12,
+        "h": 8
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max",
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "stacking": {
+          "mode": "none"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "opacity"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 * avg by (hostname) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
+          "legendFormat": "{{hostname}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "SMART \u2014 Power-on time + warnings (JBSRV01 = all physical drives)",
+      "type": "row",
+      "collapsed": false,
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 41,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 13,
+      "title": "Power-on hours per drive",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Cumulative power-on hours per physical drive. Used to gauge drive age \u2014 consumer drives drift into the failure-rate climb past ~40-50k hours.",
+      "gridPos": {
+        "x": 0,
+        "y": 42,
+        "w": 16,
+        "h": 8
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max",
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "stacking": {
+          "mode": "none"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "h",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "opacity"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "smartctl_device_power_on_seconds{instance=\"192.168.0.200\"} / 3600",
+          "legendFormat": "{{device}} {{model_name}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Drives with SMART warning (exit_status > 0)",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Count of drives where smartctl exit_status > 0. The exit status is a bitfield \u2014 0 is the only clean value; any non-zero means SMART flagged the drive.",
+      "gridPos": {
+        "x": 16,
+        "y": 42,
+        "w": 8,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "count(smartctl_device_smartctl_exit_status{instance=\"192.168.0.200\"} > 0) or vector(0)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Drives with SMART status FAILED",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Count of drives whose SMART overall-health self-assessment reports FAILED. Expected 0 \u2014 any non-zero means a drive is dying, see the SmartDriveStatusFailed alert.",
+      "gridPos": {
+        "x": 16,
+        "y": 46,
+        "w": 8,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "count(smartctl_device_smart_status{instance=\"192.168.0.200\"} == 0) or vector(0)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "title": "Backup / DR Status: last successful heartbeat per job",
+      "type": "row",
+      "collapsed": false,
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 50,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 17,
+      "title": "JBSRV01 config",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Time since the last successful Proxmox host config backup. Expected daily \u2014 yellow at ~25h, red at ~50h means the backup job is failing.",
+      "gridPos": {
+        "x": 0,
+        "y": 51,
+        "w": 4,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 90000
+              },
+              {
+                "color": "red",
+                "value": 180000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "clamp_min(time() - backup_last_success_timestamp_seconds{name=\"jbsrv01-config-backup\"}, 0)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "title": "JBDNS01 config",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Time since the last successful Pi-hole/JBDNS01 config backup. Expected daily \u2014 red at ~50h means DNS/DHCP config is no longer being captured.",
+      "gridPos": {
+        "x": 4,
+        "y": 51,
+        "w": 4,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 90000
+              },
+              {
+                "color": "red",
+                "value": 180000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "clamp_min(time() - backup_last_success_timestamp_seconds{name=\"jbdns01-config-backup\"}, 0)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "title": "JBVM02 secrets",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Time since the last successful JBVM02 secrets backup. Expected daily \u2014 red at ~50h means credential material is not being protected.",
+      "gridPos": {
+        "x": 8,
+        "y": 51,
+        "w": 4,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 90000
+              },
+              {
+                "color": "red",
+                "value": 180000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "clamp_min(time() - backup_last_success_timestamp_seconds{name=\"jbvm02-secrets-backup\"}, 0)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "title": "MC world (daily)",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Time since the last successful daily Minecraft world snapshot. Red at ~50h means a day's worth of world progress is unprotected.",
+      "gridPos": {
+        "x": 12,
+        "y": 51,
+        "w": 4,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 90000
+              },
+              {
+                "color": "red",
+                "value": 180000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "clamp_min(time() - backup_last_success_timestamp_seconds{name=\"mc-world-backup\",slot=\"daily\"}, 0)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "title": "MC world (4h)",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Time since the last 4-hourly rolling Minecraft world snapshot. Yellow at ~5h, red at ~10h means the short-cadence backup has stalled.",
+      "gridPos": {
+        "x": 16,
+        "y": 51,
+        "w": 4,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 18000
+              },
+              {
+                "color": "red",
+                "value": 36000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "clamp_min(time() - backup_last_success_timestamp_seconds{name=\"mc-world-backup\",slot=\"rolling\"}, 0)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "title": "NAS media pipeline",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Time since the NAS media-integrity ingest pipeline last ran. Expected every minute \u2014 yellow at 3m, red at 10m means the cron is wedged (stuck flock / disabled job) and inbound files are not being verified or moved.",
+      "gridPos": {
+        "x": 20,
+        "y": 51,
+        "w": 4,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 180
+              },
+              {
+                "color": "red",
+                "value": 600
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "clamp_min(time() - backup_last_success_timestamp_seconds{name=\"nas-media-pipeline\"}, 0)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "title": "Textfile scrape error (any host)",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "1 if any host's node-exporter textfile collector is broken or unreadable. Disambiguates 'textfile dir missing' from 'all backups genuinely failed' \u2014 the former lights every backup tile red at once.",
+      "gridPos": {
+        "x": 0,
+        "y": 55,
+        "w": 6,
+        "h": 4
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(node_textfile_scrape_error{job=\"node-exporter-external\"})",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "title": "Residual gaps",
+      "type": "text",
+      "description": "Backup/DR coverage gaps not visible in the heartbeat tiles above \u2014 single-copy paths and single-parity pools.",
+      "gridPos": {
+        "x": 6,
+        "y": 55,
+        "w": 18,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "\n### Residual gaps not covered by heartbeats above\n\n- **JBNAS_MEDIA** is single-parity RAIDZ1 with no snapshots. A second concurrent drive failure loses the ~5 TB media library.\n- **`data` pool**: `_inbox` and `system-state` paths are single-copy (`mc-backups` is now covered via `mc-world-backup`).\n"
+      }
+    }
+  ],
+  "links": []
+}
