@@ -20,6 +20,7 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 | [smart-drive-warning](alerts/smart-drive-warning.md) | SmartDriveAttributesBad, SmartSsdLifeLeftLow |
 | [smart-drive-failed](alerts/smart-drive-failed.md) | SmartDriveStatusFailed |
 | [node-filesystem](alerts/node-filesystem.md) | NodeFilesystemLow/Critical |
+| [pve-storage-capacity](alerts/pve-storage-capacity.md) | PveStorageAllocationHigh/Critical (hypervisor thin-pool allocation) |
 | [node-resource-pressure](alerts/node-resource-pressure.md) | NodeMemoryThrottled, NodeIOThrottled |
 | [node-clock-skew](alerts/node-clock-skew.md) | NodeClockSkew |
 | [zfs-pool-not-online](alerts/zfs-pool-not-online.md) | ZfsPoolNotOnline |
