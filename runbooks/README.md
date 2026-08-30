@@ -26,6 +26,7 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 | [backup-heartbeat-stale](alerts/backup-heartbeat-stale.md) | BackupHeartbeatStale, VzdumpHeartbeatStale |
 | [jbvm02-maintenance-stale](alerts/jbvm02-maintenance-stale.md) | Jbvm02MaintenanceStale |
 | [media-corruption-detected](alerts/media-corruption-detected.md) | MediaCorruptionDetected |
+| [jbvm01-nas-dropbox-mount](alerts/jbvm01-nas-dropbox-mount.md) | NasDropboxMountAbsent, NasDropboxMountUnhealthy |
 | [tautulli-monitoring-down](alerts/tautulli-monitoring-down.md) | TautulliMonitoringDown |
 | [logging-stack-down](alerts/logging-stack-down.md) | LokiDown, PromtailDown |
 | [tracing-stack-down](alerts/tracing-stack-down.md) | OtelCollectorDown, TempoDown |
