@@ -14,7 +14,7 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 | [plex-exporter-burn](alerts/plex-exporter-burn.md) | PlexErrorBudgetBurnFast/Slow (demoted exporter signal) |
 | [minecraft-burn](alerts/minecraft-burn.md) | MinecraftErrorBudgetBurnFast/Slow |
 | [pihole-dns-burn](alerts/pihole-dns-burn.md) | PiholeDnsBurnFast (the real user-facing SLI) |
-| [pihole-exporter-burn](alerts/pihole-exporter-burn.md) | PiholeErrorBudgetBurnFast/Slow (demoted exporter signal) |
+| [pihole-exporter-burn](alerts/pihole-exporter-burn.md) | PiholeExporterWedged (exporter signal; replaced the burn-rate pair 2026-09) |
 | [nas-burn](alerts/nas-burn.md) | NasErrorBudgetBurnFast/Slow |
 | [tailscale-burn](alerts/tailscale-burn.md) | TailscaleNodeBurnFast/Slow |
 | [smart-drive-warning](alerts/smart-drive-warning.md) | SmartDriveAttributesBad, SmartSsdLifeLeftLow |
