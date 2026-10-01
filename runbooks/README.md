@@ -2,6 +2,8 @@
 
 One task per file. Each runbook is written to be executed under mild stress: the commands are copy-pasteable, the expected output is stated, and the failure modes that motivated the runbook are described rather than hidden.
 
+Backup and restore runbooks (one per data store, the push-over-SSH backup pattern, the drill calendar) live in [homelab-runbooks](https://github.com/josephbannon-tech/homelab-runbooks).
+
 ## Alert triage (`alerts/`)
 
 One file per alert (or fast/slow pair), linked from every alert's `runbook_url` annotation so the page carries its own triage. Each states what the signal actually measures, how to tell a false positive, and the known causes from this estate's incident history.
@@ -31,6 +33,10 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 | [tautulli-monitoring-down](alerts/tautulli-monitoring-down.md) | TautulliMonitoringDown |
 | [logging-stack-down](alerts/logging-stack-down.md) | LokiDown, PromtailDown |
 | [tracing-stack-down](alerts/tracing-stack-down.md) | OtelCollectorDown, TempoDown |
+| [wan-reachability](alerts/wan-reachability.md) | WanDown, WanPartialService, UpstreamDnsDown |
+| [radicale-down](alerts/radicale-down.md) | RadicaleDown |
+| [pvc-capacity](alerts/pvc-capacity.md) | PersistentVolumeUsageHigh, PersistentVolumeFillingUp |
+| [llm-server-tier-down](alerts/llm-server-tier-down.md) | LlmServerTierDown |
 
 ## Change validation (before merge)
 
