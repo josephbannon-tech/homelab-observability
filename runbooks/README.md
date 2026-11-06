@@ -34,6 +34,7 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 | [logging-stack-down](alerts/logging-stack-down.md) | LokiDown, PromtailDown |
 | [tracing-stack-down](alerts/tracing-stack-down.md) | OtelCollectorDown, TempoDown |
 | [wan-reachability](alerts/wan-reachability.md) | WanDown, WanPartialService, UpstreamDnsDown |
+| [wan-bufferbloat](alerts/wan-bufferbloat.md) | WanBufferbloat |
 | [radicale-down](alerts/radicale-down.md) | RadicaleDown |
 | [pvc-capacity](alerts/pvc-capacity.md) | PersistentVolumeUsageHigh, PersistentVolumeFillingUp |
 | [llm-server-tier-down](alerts/llm-server-tier-down.md) | LlmServerTierDown |
