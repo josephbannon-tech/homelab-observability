@@ -3,7 +3,7 @@
 | Alert | Severity | Condition |
 |-------|----------|-----------|
 | SmartDriveAttributesBad | warning | non-zero raw Reallocated_Sector_Ct, Current_Pending_Sector, or Offline_Uncorrectable, 10m |
-| SmartSsdLifeLeftLow | warning | SSD life-left normalised value below 5, sustained 1h |
+| SmartSsdLifeLeftLow | warning | SSD wear value within 5 points of the drive's own vendor threshold, sustained 1h |
 
 **Signal**: smartctl_exporter on the hypervisor (JBSRV01 `:9633`), the only host that sees the physical drives (the NAS VM sees virtio devices). These are the plan-a-replacement alerts, deliberately warning-severity: they mean wear or media damage is real and trending, not that failure is imminent (that's [smart-drive-failed.md](smart-drive-failed.md)).
 
