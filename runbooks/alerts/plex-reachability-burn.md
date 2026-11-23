@@ -5,7 +5,7 @@
 | PlexReachabilityBurnFast | critical | burn rate >14.4x on 1h+5m windows, sustained 2m |
 | PlexReachabilityBurnSlow | warning | burn rate >6x on 6h+30m windows, sustained 15m |
 
-**Signal**: the blackbox HTTP probe of `http://192.168.0.202:32400/identity`. This is the real user-facing SLI: family devices cannot reach Plex. Both alerts are suppressed during the 02:00-06:00 BST maintenance window (the host's nightly self-reboot), so if this is paging, it is outside the routine reboot and real.
+**Signal**: the blackbox HTTP probe of `http://192.168.0.202:32400/identity`. This is the real user-facing SLI: family devices cannot reach Plex. Both alerts fire at any hour. Until 2026-11-23 they were suppressed from 01:00 to 05:00 UTC for a nightly Shield reboot; that reboot stopped, and 30 days of probe history showed the window was hiding nothing, so it was closed (the `plex:maintenance_window` recording rule is now a constant 0).
 
 ## Triage
 
@@ -15,7 +15,7 @@
 
 ## Known causes, in likelihood order
 
-- **Nightly reboot hang.** The Shield self-reboots around 2am nightly (persists even with OTA endpoints blocked at the DNS layer). Normally back in under a minute; occasionally it hangs mid-boot and needs a manual power-cycle. An alert shortly after the maintenance window ends is very likely this, surfacing late because paging was suppressed inside the window.
+- **Reboot hang.** The Shield used to self-reboot around 2am nightly; it no longer does (32 days of uptime measured on 2026-11-23). Any reboot can still hang mid-boot: if the probe is down and the device answers ping, check whether it is stuck on the boot logo and power-cycle it.
 - **Network drop on the device.** A ~33-minute outage once fired this alert with the host simply off the network; the DNS probe on the same blackbox exporter stayed green, proving the monitoring path was fine.
 - **PMS crash with host up**: ICMP fine, `:32400` refused. Restart Plex on the device.
 
