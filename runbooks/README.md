@@ -38,6 +38,11 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 | [radicale-down](alerts/radicale-down.md) | RadicaleDown |
 | [pvc-capacity](alerts/pvc-capacity.md) | PersistentVolumeUsageHigh, PersistentVolumeFillingUp |
 | [llm-server-tier-down](alerts/llm-server-tier-down.md) | LlmServerTierDown |
+| [host-reboot-pending](alerts/host-reboot-pending.md) | HostRebootPending |
+| [systemd-unit-failed](alerts/systemd-unit-failed.md) | SystemdUnitFailed |
+| [promtail-not-shipping](alerts/promtail-not-shipping.md) | PromtailNotShipping (log shipping on hosts outside the cluster) |
+| [host-state-stale](alerts/host-state-stale.md) | HostStateStale (the watchdog on the four above and below) |
+| [pihole-adlist-stale](alerts/pihole-adlist-stale.md) | PiholeAdlistStale (a blocklist that fails open and silent) |
 
 ## Change validation (before merge)
 
