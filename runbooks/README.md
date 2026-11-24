@@ -10,6 +10,7 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 
 | Runbook | Alerts |
 |---------|--------|
+| [docs-lint-stale](alerts/docs-lint-stale.md) | DocsLintStale |
 | [plex-reachability-burn](alerts/plex-reachability-burn.md) | PlexReachabilityBurnFast/Slow (the real user-facing SLI) |
 | [plex-library-unreadable](alerts/plex-library-unreadable.md) | PlexLibraryUnreadable (up-but-can't-serve / SMB wedge) |
 | [plex-reboot-storm](alerts/plex-reboot-storm.md) | PlexRebootStorm |
