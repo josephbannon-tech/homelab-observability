@@ -29,6 +29,7 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 | [zfs-pool-not-online](alerts/zfs-pool-not-online.md) | ZfsPoolNotOnline |
 | [backup-heartbeat-stale](alerts/backup-heartbeat-stale.md) | BackupHeartbeatStale, VzdumpHeartbeatStale |
 | [jbvm02-maintenance-stale](alerts/jbvm02-maintenance-stale.md) | Jbvm02MaintenanceStale |
+| [docs-lint-stale](alerts/docs-lint-stale.md) | DocsLintStale |
 | [media-corruption-detected](alerts/media-corruption-detected.md) | MediaCorruptionDetected |
 | [jbvm01-nas-dropbox-mount](alerts/jbvm01-nas-dropbox-mount.md) | NasDropboxMountAbsent, NasDropboxMountUnhealthy |
 | [tautulli-monitoring-down](alerts/tautulli-monitoring-down.md) | TautulliMonitoringDown |
