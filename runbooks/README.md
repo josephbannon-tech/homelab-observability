@@ -15,6 +15,7 @@ One file per alert (or fast/slow pair), linked from every alert's `runbook_url` 
 | [plex-reboot-storm](alerts/plex-reboot-storm.md) | PlexRebootStorm |
 | [plex-exporter-burn](alerts/plex-exporter-burn.md) | PlexErrorBudgetBurnFast/Slow (demoted exporter signal) |
 | [minecraft-burn](alerts/minecraft-burn.md) | MinecraftErrorBudgetBurnFast/Slow |
+| [satisfactory-down](alerts/satisfactory-down.md) | SatisfactoryDown (the server's own health API, not a port check) |
 | [pihole-dns-burn](alerts/pihole-dns-burn.md) | PiholeDnsBurnFast (the real user-facing SLI) |
 | [pihole-exporter-burn](alerts/pihole-exporter-burn.md) | PiholeExporterWedged (exporter signal; replaced the burn-rate pair 2026-09) |
 | [nas-burn](alerts/nas-burn.md) | NasErrorBudgetBurnFast/Slow |
